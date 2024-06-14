@@ -1,4 +1,4 @@
 -- init.sql
-CREATE USER "user" WITH PASSWORD '12345';
-CREATE DATABASE "lesson" OWNER "user";
-GRANT ALL PRIVILEGES ON DATABASE "lesson" TO "user";
+CREATE USER "user" WITH PASSWORD 'lesson';
+CREATE DATABASE "lesson" OWNER "lesson";
+GRANT ALL PRIVILEGES ON DATABASE "lesson" TO "lesson";
