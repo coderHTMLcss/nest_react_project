@@ -13,10 +13,10 @@ export class AuthController {
     @ApiTags('API')
     @ApiResponse({
         status: 201,
-        type: CreateUserDTO,
+        type: AuthUserResponse,
     })
     @Post('register')
-    register(@Body() dto: CreateUserDTO): Promise<CreateUserDTO> {
+    register(@Body() dto: CreateUserDTO): Promise<AuthUserResponse> {
         return this.authService.registerUser(dto)
     }
     @ApiTags('API')
@@ -25,7 +25,7 @@ export class AuthController {
         type: AuthUserResponse,
     })
     @Post('login')
-    login(@Body() dto: UserLoginDTO): Promise<any> {
+    login(@Body() dto: UserLoginDTO): Promise<AuthUserResponse> {
         return this.authService.loginUser(dto)
     }
 
