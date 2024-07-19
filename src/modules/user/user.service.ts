@@ -4,11 +4,13 @@ import { User } from './models/user.model'
 import * as bcrypt from 'bcrypt'
 import { CreateUserDTO, UpdateUserDTO } from './dto'
 import { Watchlist } from '../watchlist/models/watchlist.model'
-
+import { TokenService } from '../token/token.service'
+import { AuthUserResponse } from '../auth/response'
 @Injectable()
 export class UserService {
     constructor(
-        @InjectModel(User) private readonly userRepository: typeof User
+        @InjectModel(User) private readonly userRepository: typeof User,
+        private readonly tokenService: TokenService
     ) {}
 
     async findUserbyEmail(email: string) {
@@ -29,8 +31,8 @@ export class UserService {
         return dto
     }
 
-    async publicUser(email: string) {
-        return this.userRepository.findOne({
+    async publicUser(email: string): Promise<AuthUserResponse> {
+        const user = await this.userRepository.findOne({
             where: {
                 email,
             },
@@ -40,13 +42,15 @@ export class UserService {
                 required: false,
             },
         })
+        const token = await this.tokenService.generateJwtToken(user)
+        return { user, token }
     }
 
     async updateUser(
-        email: string,
+        userId: number,
         dto: UpdateUserDTO
     ): Promise<UpdateUserDTO> {
-        await this.userRepository.update(dto, { where: { email } })
+        await this.userRepository.update(dto, { where: { id: userId } })
         return dto
     }
 
