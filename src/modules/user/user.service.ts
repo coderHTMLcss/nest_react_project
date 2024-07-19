@@ -47,10 +47,10 @@ export class UserService {
     }
 
     async updateUser(
-        email: string,
+        userId: number,
         dto: UpdateUserDTO
     ): Promise<UpdateUserDTO> {
-        await this.userRepository.update(dto, { where: { email } })
+        await this.userRepository.update(dto, { where: { id: userId } })
         return dto
     }
 
