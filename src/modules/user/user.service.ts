@@ -86,8 +86,8 @@ export class UserService {
         return this.userRepository.update(data, { where: { id: userId } })
     }
 
-    async deleteUser(email: string): Promise<boolean> {
-        await this.userRepository.destroy({ where: { email } })
+    async deleteUser(id: number): Promise<boolean> {
+        await this.userRepository.destroy({ where: { id } })
         return true
     }
 }
