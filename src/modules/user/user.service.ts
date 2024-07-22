@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { User } from './models/user.model'
 import * as bcrypt from 'bcrypt'
-import { CreateUserDTO, UpdateUserDTO } from './dto'
+import { CreateUserDTO, UpdatePasswordUserDTO, UpdateUserDTO } from './dto'
 import { Watchlist } from '../watchlist/models/watchlist.model'
 import { TokenService } from '../token/token.service'
 import { AuthUserResponse } from '../auth/response'
+import { AppError } from 'src/common/constants/errors'
 @Injectable()
 export class UserService {
     constructor(
@@ -13,8 +14,24 @@ export class UserService {
         private readonly tokenService: TokenService
     ) {}
 
-    async findUserbyEmail(email: string) {
-        return this.userRepository.findOne({ where: { email: email } })
+    async findUserByEmail(email: string): Promise<User> {
+        return this.userRepository.findOne({
+            where: { email: email },
+            include: {
+                model: Watchlist,
+                required: false,
+            },
+        })
+    }
+
+    async findUserByID(id: number): Promise<User> {
+        return this.userRepository.findOne({
+            where: { id },
+            include: {
+                model: Watchlist,
+                required: false,
+            },
+        })
     }
 
     async hashPassword(password: string) {
@@ -52,6 +69,21 @@ export class UserService {
     ): Promise<UpdateUserDTO> {
         await this.userRepository.update(dto, { where: { id: userId } })
         return dto
+    }
+
+    async updatePasswordUser(
+        userId: number,
+        dto: UpdatePasswordUserDTO
+    ): Promise<any> {
+        const { password } = await this.findUserByID(userId)
+        const currentPassword = await bcrypt.compare(dto.oldPassword, password)
+        if (!currentPassword)
+            return new BadRequestException(AppError.WRONG_DATA)
+        const newPassword = await this.hashPassword(dto.newPassword)
+        const data = {
+            password: newPassword,
+        }
+        return this.userRepository.update(data, { where: { id: userId } })
     }
 
     async deleteUser(email: string): Promise<boolean> {

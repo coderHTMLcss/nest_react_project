@@ -31,3 +31,13 @@ export class UpdateUserDTO {
     @IsString()
     email: string
 }
+
+export class UpdatePasswordUserDTO {
+    @ApiProperty()
+    @IsString()
+    oldPassword: string
+
+    @ApiProperty()
+    @IsString()
+    newPassword: string
+}
